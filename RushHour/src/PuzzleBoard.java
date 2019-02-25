@@ -1,23 +1,36 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class PuzzleBoard{
 	// Do not change the name or type of this field
 	private Vehicle[] idToVehicle;
-	
+	private HashMap<Integer, HashSet<Integer>> locationToVehicle; //Row major representation of locations. Key of map are rows, value is set of columns where there is a vehicle occupying that row/col spot
 	// You may add additional private fields here
 	
 	public PuzzleBoard(Vehicle[] idToVehicleP){
 		idToVehicle = new Vehicle[idToVehicleP.length];
+		locationToVehicle = new HashMap<Integer, HashSet<Integer>>();
 		for(int i = 0; i < idToVehicleP.length; i++){
-			if(idToVehicleP[i] != null){
-				idToVehicle[i] = idToVehicleP[i];
+			Vehicle v = idToVehicleP[i];
+			idToVehicle[i] = idToVehicleP[i];
+			if(v != null){
+				if(!locationToVehicle.containsKey(v.getLeftTopRow())){
+					locationToVehicle.put(v.getLeftTopRow(), new HashSet<Integer>());
+				}
+				for(int row = v.getLeftTopRow()+1; row < v.getLeftTopRow() + v.getLength() && !v.getIsHorizontal(); row++){
+					locationToVehicle.put(row, new HashSet<Integer>());
+				}
+				for(int col = v.getLeftTopColumn(); col < v.getLeftTopColumn() + v.getLength() && v.getIsHorizontal(); col++){
+					locationToVehicle.get(v.getLeftTopRow()).add(col);
+				}
 			}
 		}
 	}
 	
 	public Vehicle getVehicle(int id){
-		throw new UnsupportedOperationException();
+		return idToVehicle[id];
 	}
 
 	public Vehicle getVehicle(int row, int column){
