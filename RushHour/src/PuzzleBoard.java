@@ -6,24 +6,44 @@ import java.util.HashSet;
 public class PuzzleBoard{
 	// Do not change the name or type of this field
 	private Vehicle[] idToVehicle;
-	private HashMap<Integer, HashSet<Integer>> locationToVehicle; //Row major representation of locations. Key of map are rows, value is set of columns where there is a vehicle occupying that row/col spot
+	private HashMap<Integer, HashMap<Integer, Vehicle>> locationToVehicle; //Row major representation of locations. Key of map are rows, value is set of columns where there is a vehicle occupying that row/col spot
 	// You may add additional private fields here
-	
+	/*public static void main(String[] args){
+		Vehicle[] vs = new Vehicle[3];
+		vs[0] = new Vehicle(0, true, 2, 4, 2);
+		vs[1] = new Vehicle(1, true, 5, 2, 3);
+		vs[2] = new Vehicle(2, false, 0, 2, 3);
+		PuzzleBoard p = new PuzzleBoard(vs);
+		
+		System.out.println(p.getVehicle(2, 0));
+		System.out.println(p.getVehicle(2, 2));
+		System.out.println(p.getVehicle(2, 4));
+		System.out.println(p.getVehicle(5, 4));
+		System.out.println();
+		System.out.println(p.getVehicle(0));
+		System.out.println(p.getVehicle(1));
+		System.out.println(p.getVehicle(2));
+		System.out.println(p.isGoal());
+	}*/
 	public PuzzleBoard(Vehicle[] idToVehicleP){
 		idToVehicle = new Vehicle[idToVehicleP.length];
-		locationToVehicle = new HashMap<Integer, HashSet<Integer>>();
+		locationToVehicle = new HashMap<Integer, HashMap<Integer, Vehicle>>();
 		for(int i = 0; i < idToVehicleP.length; i++){
 			Vehicle v = idToVehicleP[i];
 			idToVehicle[i] = idToVehicleP[i];
 			if(v != null){
 				if(!locationToVehicle.containsKey(v.getLeftTopRow())){
-					locationToVehicle.put(v.getLeftTopRow(), new HashSet<Integer>());
+					locationToVehicle.put(v.getLeftTopRow(), new HashMap<Integer, Vehicle>());
+					locationToVehicle.get(v.getLeftTopRow()).put(v.getLeftTopColumn(), v);
 				}
 				for(int row = v.getLeftTopRow()+1; row < v.getLeftTopRow() + v.getLength() && !v.getIsHorizontal(); row++){
-					locationToVehicle.put(row, new HashSet<Integer>());
+					if(locationToVehicle.get(row) == null){
+						locationToVehicle.put(row, new HashMap<Integer, Vehicle>());
+					}
+					locationToVehicle.get(row).put(v.getLeftTopColumn(), v);
 				}
 				for(int col = v.getLeftTopColumn(); col < v.getLeftTopColumn() + v.getLength() && v.getIsHorizontal(); col++){
-					locationToVehicle.get(v.getLeftTopRow()).add(col);
+					locationToVehicle.get(v.getLeftTopRow()).put(col, v);
 				}
 			}
 		}
@@ -34,7 +54,10 @@ public class PuzzleBoard{
 	}
 
 	public Vehicle getVehicle(int row, int column){
-		throw new UnsupportedOperationException();
+		if(locationToVehicle.get(row) == null){
+			return null;
+		}
+		return locationToVehicle.get(row).get(column);
 	}
 	
 	public int heuristicCostToGoal(){
@@ -42,7 +65,7 @@ public class PuzzleBoard{
 	}
 	
 	public boolean isGoal(){
-		throw new UnsupportedOperationException();
+		return getVehicle(2, 5).getId() == 0;
 	}
 	
 	public Iterable<PuzzleBoard> getNeighbors(){
