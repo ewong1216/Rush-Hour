@@ -8,23 +8,20 @@ public class PuzzleBoard{
 	private Vehicle[] idToVehicle;
 	private HashMap<Integer, HashMap<Integer, Vehicle>> locationToVehicle; //Row major representation of locations. Key of map are rows, value is set of columns where there is a vehicle occupying that row/col spot
 	// You may add additional private fields here
-	/*public static void main(String[] args){
-		Vehicle[] vs = new Vehicle[3];
-		vs[0] = new Vehicle(0, true, 2, 4, 2);
-		vs[1] = new Vehicle(1, true, 5, 2, 3);
-		vs[2] = new Vehicle(2, false, 0, 2, 3);
+	public static void main(String[] args){
+		Vehicle[] vs = new Vehicle[16];
+		vs[0] = new Vehicle(0, true, 2, 0, 2);
+		vs[2] = new Vehicle(2, false, 0, 0, 2);
+		vs[4] = new Vehicle(4, false, 0, 1, 2);
+		vs[6] = new Vehicle(6, true, 3, 0, 2);
+		vs[8] = new Vehicle(8, true, 4, 0, 2);
+		vs[10] = new Vehicle(10, true, 5, 0, 2);
+		vs[12] = new Vehicle(12, false, 1, 4, 3);
+		vs[14] = new Vehicle(14, true, 4, 3, 3);
 		PuzzleBoard p = new PuzzleBoard(vs);
 		
-		System.out.println(p.getVehicle(2, 0));
-		System.out.println(p.getVehicle(2, 2));
-		System.out.println(p.getVehicle(2, 4));
-		System.out.println(p.getVehicle(5, 4));
-		System.out.println();
-		System.out.println(p.getVehicle(0));
-		System.out.println(p.getVehicle(1));
-		System.out.println(p.getVehicle(2));
-		System.out.println(p.isGoal());
-	}*/
+		System.out.println(p.getVehicle(0, 1));
+	}
 	public PuzzleBoard(Vehicle[] idToVehicleP){
 		idToVehicle = new Vehicle[idToVehicleP.length];
 		locationToVehicle = new HashMap<Integer, HashMap<Integer, Vehicle>>();
@@ -34,8 +31,8 @@ public class PuzzleBoard{
 			if(v != null){
 				if(!locationToVehicle.containsKey(v.getLeftTopRow())){
 					locationToVehicle.put(v.getLeftTopRow(), new HashMap<Integer, Vehicle>());
-					locationToVehicle.get(v.getLeftTopRow()).put(v.getLeftTopColumn(), v);
 				}
+				locationToVehicle.get(v.getLeftTopRow()).put(v.getLeftTopColumn(), v);
 				for(int row = v.getLeftTopRow()+1; row < v.getLeftTopRow() + v.getLength() && !v.getIsHorizontal(); row++){
 					if(locationToVehicle.get(row) == null){
 						locationToVehicle.put(row, new HashMap<Integer, Vehicle>());
@@ -65,7 +62,7 @@ public class PuzzleBoard{
 	}
 	
 	public boolean isGoal(){
-		return getVehicle(2, 5).getId() == 0;
+		return getVehicle(2, 5) != null && getVehicle(2, 5).getId() == 0;
 	}
 	
 	public Iterable<PuzzleBoard> getNeighbors(){
