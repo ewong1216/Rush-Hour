@@ -6,8 +6,12 @@ import java.util.HashSet;
 public class PuzzleBoard{
 	// Do not change the name or type of this field
 	private Vehicle[] idToVehicle;
-	private HashMap<Integer, HashMap<Integer, Vehicle>> locationToVehicle; //Row major representation of locations. Key of map are rows, value is set of columns where there is a vehicle occupying that row/col spot
-	// You may add additional private fields here
+	private Vehicle[][] locationToVehicle; //Row major representation of locations.
+	
+	//To generalize the class
+	private final int height = PuzzleManager.NUM_ROWS;
+	private final int width = PuzzleManager.NUM_COLUMNS;
+	
 	public static void main(String[] args){
 		Vehicle[] vs = new Vehicle[16];
 		vs[0] = new Vehicle(0, true, 2, 0, 2);
@@ -20,27 +24,25 @@ public class PuzzleBoard{
 		vs[14] = new Vehicle(14, true, 4, 3, 3);
 		PuzzleBoard p = new PuzzleBoard(vs);
 		
-		System.out.println(p.getVehicle(0, 1));
+		System.out.println(p);
+		System.out.println(p.heuristicCostToGoal());
+		for(PuzzleBoard pb : p.getNeighbors()){
+			System.out.println(pb);
+			System.out.println(pb.heuristicCostToGoal());
+		}
 	}
 	public PuzzleBoard(Vehicle[] idToVehicleP){
 		idToVehicle = new Vehicle[idToVehicleP.length];
-		locationToVehicle = new HashMap<Integer, HashMap<Integer, Vehicle>>();
-		for(int i = 0; i < idToVehicleP.length; i++){
-			Vehicle v = idToVehicleP[i];
+		locationToVehicle = new Vehicle[height][width];
+		for(int i = 0; i < idToVehicle.length; i++){
 			idToVehicle[i] = idToVehicleP[i];
+			Vehicle v = idToVehicle[i];
 			if(v != null){
-				if(!locationToVehicle.containsKey(v.getLeftTopRow())){
-					locationToVehicle.put(v.getLeftTopRow(), new HashMap<Integer, Vehicle>());
+				for(int row = v.getLeftTopRow(); !v.getIsHorizontal() && row < v.getLeftTopRow() + v.getLength(); row++){
+					locationToVehicle[row][v.getLeftTopColumn()] = v;
 				}
-				locationToVehicle.get(v.getLeftTopRow()).put(v.getLeftTopColumn(), v);
-				for(int row = v.getLeftTopRow()+1; row < v.getLeftTopRow() + v.getLength() && !v.getIsHorizontal(); row++){
-					if(locationToVehicle.get(row) == null){
-						locationToVehicle.put(row, new HashMap<Integer, Vehicle>());
-					}
-					locationToVehicle.get(row).put(v.getLeftTopColumn(), v);
-				}
-				for(int col = v.getLeftTopColumn(); col < v.getLeftTopColumn() + v.getLength() && v.getIsHorizontal(); col++){
-					locationToVehicle.get(v.getLeftTopRow()).put(col, v);
+				for(int col = v.getLeftTopColumn(); v.getIsHorizontal() && col < v.getLeftTopColumn() + v.getLength(); col++){
+					locationToVehicle[v.getLeftTopRow()][col] = v;
 				}
 			}
 		}
@@ -50,15 +52,18 @@ public class PuzzleBoard{
 		return idToVehicle[id];
 	}
 
-	public Vehicle getVehicle(int row, int column){
-		if(locationToVehicle.get(row) == null){
-			return null;
-		}
-		return locationToVehicle.get(row).get(column);
+	public Vehicle getVehicle(int row, int col){
+		return locationToVehicle[row][col];
 	}
 	
 	public int heuristicCostToGoal(){
-		throw new UnsupportedOperationException();
+		int cost = 0;
+		for(int col = getVehicle(0).getLeftTopColumn() + 2; col < width; col++,cost++){
+			if(getVehicle(2,col) != null){
+				cost++;
+			}
+		}
+		return cost;
 	}
 	
 	public boolean isGoal(){
@@ -66,9 +71,35 @@ public class PuzzleBoard{
 	}
 	
 	public Iterable<PuzzleBoard> getNeighbors(){
-		throw new UnsupportedOperationException();
+		Queue<PuzzleBoard> neighbors = new Queue<PuzzleBoard>();
+		for(int i = 0; i < idToVehicle.length; i++){
+			Vehicle v = idToVehicle[i];
+			if(v != null){
+				if(v.getIsHorizontal()){
+					if(v.getLeftTopColumn() > 0 && getVehicle(v.getLeftTopRow(), v.getLeftTopColumn() - 1) == null){
+						neighbors.enqueue(createNeighbor(i,0,-1));
+					}
+					if(v.getLeftTopColumn() + v.getLength() < width && getVehicle(v.getLeftTopRow(), v.getLeftTopColumn() +v.getLength()) == null){
+						neighbors.enqueue(createNeighbor(i,0,1));
+					}
+				}
+				else{
+					if(v.getLeftTopRow() - 1 >= 0 && getVehicle(v.getLeftTopRow() - 1, v.getLeftTopColumn()) == null){
+						neighbors.enqueue(createNeighbor(i,-1,0));
+					}
+					if(v.getLeftTopRow() + v.getLength() < height && getVehicle(v.getLeftTopRow() + v.getLength(), v.getLeftTopColumn()) == null){
+						neighbors.enqueue(createNeighbor(i,1,0));
+					}
+				}
+			}
+		}
+		return neighbors;
 	}
-	
+	private PuzzleBoard createNeighbor(int id, int rowChange, int colChange){
+		Vehicle[] shifted = Arrays.copyOf(idToVehicle, idToVehicle.length);
+		shifted[id] = new Vehicle(id, shifted[id].getIsHorizontal(), shifted[id].getLeftTopRow() + rowChange, shifted[id].getLeftTopColumn() + colChange, shifted[id].getLength());
+		return new PuzzleBoard(shifted);
+	}
 	public String toString(){
 		// You do not need to modify this code, but you can if you really
 		// want to.  The automated tests will not use this method, but
