@@ -8,15 +8,29 @@ public class Solver{
 	public Solver(PuzzleBoard initial){
 		UpdateableMinPQ<SearchNode> pq = new UpdateableMinPQ<SearchNode>();
 		pq.insert(new SearchNode(initial,0,null));
-
+		HashSet<PuzzleBoard> closed = new HashSet<PuzzleBoard>();
+		HashMap<PuzzleBoard, SearchNode> open = new HashMap<PuzzleBoard, SearchNode>();
 		while(!pq.isEmpty()){
 			SearchNode cur = pq.delMin();
 			if(cur.board.isGoal()){
 				goal = cur;
 				break;
 			}
-			for(PuzzleBoard b : cur.board.getNeighbors()){
-				pq.insert(new SearchNode(b,cur.costFromBeginningToHere+1,cur));
+			closed.add(cur.board);
+			open.remove(cur.board);
+
+			for(PuzzleBoard board : cur.board.getNeighbors()){
+				if(!closed.contains(board)){
+					SearchNode neighbor = new SearchNode(board,cur.costFromBeginningToHere+1,cur);
+					if(open.containsKey(board) && neighbor.costFromBeginningToHere < open.get(board).costFromBeginningToHere){
+						pq.updateKey(open.get(board), neighbor);
+						open.replace(neighbor.board, neighbor);
+					}
+					if(!open.containsKey(board)){
+						pq.insert(neighbor);
+						open.put(board, neighbor);
+					}
+				}
 			}
 		}
 	}

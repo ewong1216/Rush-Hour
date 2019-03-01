@@ -214,6 +214,7 @@ public class PuzzleManager
 						animateToBoard(previousBoardReadFromSolution);
 					}
 				}
+
 				else if (key == KeyEvent.VK_ENTER)
 				{
 					solveIfNecessary();
@@ -727,15 +728,16 @@ public class PuzzleManager
 		// You can run boards in two ways by choosing which code to comment-out
 
 		// This runs EVERY board from the testInput folder
-//		runAllBoardsFromInputFolder();
+		//runAllBoardsFromInputFolder();
 
 		// This runs SPECIFIC board(s) by name.  You may add
 		// or remove board filenames from this array
 		runBoards(new String[]
 				{
-						"board-puzzle-01.txt",
-						"board-puzzle-11.txt",
-						"board-puzzle-21.txt",
+//						"board-puzzle-01.txt",
+//						"board-puzzle-11.txt",
+//						"board-puzzle-21.txt",
+						"board-puzzle-40.txt"
 				});
 	}
 }

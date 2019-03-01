@@ -14,21 +14,27 @@ public class PuzzleBoard{
 	
 	public static void main(String[] args){
 		Vehicle[] vs = new Vehicle[16];
-		vs[0] = new Vehicle(0, true, 2, 0, 2);
-		vs[2] = new Vehicle(2, false, 0, 0, 2);
-		vs[4] = new Vehicle(4, false, 0, 1, 2);
-		vs[6] = new Vehicle(6, true, 3, 0, 2);
-		vs[8] = new Vehicle(8, true, 4, 0, 2);
-		vs[10] = new Vehicle(10, true, 5, 0, 2);
-		vs[12] = new Vehicle(12, false, 1, 4, 3);
-		vs[14] = new Vehicle(14, true, 4, 3, 3);
+		vs[0] = new Vehicle(0, true, 2, 1, 2);
+		vs[1] = new Vehicle(1, true, 0, 0 ,2);
+		vs[2] = new Vehicle(2, false, 4, 0, 2);
+		vs[3] = new Vehicle(3, true, 4, 4, 2);
+		vs[12] = new Vehicle(12, false, 0, 5, 3);
+		vs[13] = new Vehicle(13, false, 1, 0, 3);
+		vs[14] = new Vehicle(14, false, 1, 3, 3);
+		vs[15] = new Vehicle(15, true, 5, 2, 3);
+		
 		PuzzleBoard p = new PuzzleBoard(vs);
 		
-		System.out.println(p);
+		/*System.out.println(p);
 		System.out.println(p.heuristicCostToGoal());
 		for(PuzzleBoard pb : p.getNeighbors()){
 			System.out.println(pb);
 			System.out.println(pb.heuristicCostToGoal());
+		}*/
+		System.out.println("Starting solver");
+		Solver s = new Solver(p);
+		for(PuzzleBoard b : s.getPath()){
+			System.out.println(b);
 		}
 	}
 	public PuzzleBoard(Vehicle[] idToVehicleP){
