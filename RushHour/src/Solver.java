@@ -18,7 +18,7 @@ public class Solver{
 			}
 			closed.add(cur.board);
 			open.remove(cur.board);
-
+			
 			for(PuzzleBoard board : cur.board.getNeighbors()){
 				if(!closed.contains(board)){
 					SearchNode neighbor = new SearchNode(board,cur.costFromBeginningToHere+1,cur);
@@ -34,7 +34,6 @@ public class Solver{
 			}
 		}
 	}
-
 	private static class SearchNode implements Comparable<SearchNode>{
 		// Important!! Do not change the names or types of these fields!
 		private PuzzleBoard board;
